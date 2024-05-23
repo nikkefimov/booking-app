@@ -24,67 +24,71 @@ type UserData struct {
 var wg = sync.WaitGroup{}
 
 func main() {
+	for {
 
-	greetUsers()
+		greetUsers()
 
-	// *OLD PART* fmt.Printf("conferenceTickets is %T, remainingTickets is %T, conferenceName is %T\n", conferenceTickets, remainingTickets, conferenceName)
+		// *OLD PART* fmt.Printf("conferenceTickets is %T, remainingTickets is %T, conferenceName is %T\n", conferenceTickets, remainingTickets, conferenceName)
 
-	// getting data from Users
-	firstName, lastName, email, userTickets := getUserInput()
-	isValidName, isValidEmail, isValidTicketNumber := helper.ValidateUserInput(firstName, lastName, email, userTickets, remainingTickets)
+		// getting data from Users
+		firstName, lastName, email, userTickets := getUserInput()
+		isValidName, isValidEmail, isValidTicketNumber := helper.ValidateUserInput(firstName, lastName, email, userTickets, remainingTickets)
 
-	if isValidName && isValidEmail && isValidTicketNumber {
+		if isValidName && isValidEmail && isValidTicketNumber {
 
-		bookTicket(userTickets, firstName, lastName, email)
+			bookTicket(userTickets, firstName, lastName, email)
 
-		wg.Add(1)
-		go sendTicket(userTickets, firstName, lastName, email)
+			wg.Add(1)
+			go sendTicket(userTickets, firstName, lastName, email)
 
-		firstNames := getFirstNames()
-		fmt.Printf("The first names of bookings are: %v\n", firstNames) //list with names, who booked
+			firstNames := getFirstNames()
+			fmt.Printf("The first names of bookings are: %v\n", firstNames) //list with names, who booked
 
-		//logic for stop booking loop when tickets out
-		noTicketsRemaining := remainingTickets == 0
-		if noTicketsRemaining {
-			fmt.Println("Sorry, but our conference is booked out. Come back next year.")
+			//logic for stop booking loop when tickets out
+			noTicketsRemaining := remainingTickets == 0
+			if noTicketsRemaining {
+				fmt.Println("Sorry, but our conference is booked out. Come back next year.")
+				break
 
+			}
+		} else {
+			if !isValidName {
+				fmt.Println("ERROR! First name or last name you entered is too short, please start new registration form.")
+			}
+			if !isValidEmail {
+				fmt.Println("ERROR! Email address you entered doesnt contain @ sign, please start new registration form.")
+			}
+			if !isValidTicketNumber {
+				fmt.Println("ERROR! Number of tickets you entered is invalid, please start new registration form.")
+			}
 		}
-	} else {
-		if !isValidName {
-			fmt.Println("ERROR! First name or last name you entered is too short, please start new registration form.")
-		}
-		if !isValidEmail {
-			fmt.Println("ERROR! Email address you entered doesnt contain @ sign, please start new registration form.")
-		}
-		if !isValidTicketNumber {
-			fmt.Println("ERROR! Number of tickets you entered is invalid, please start new registration form.")
-		}
+		wg.Wait()
+
+		// *OLD PART*
+		/*city := "London"
+		switch city {
+		case "New York":
+			  // execute code
+		case "London":
+			  // execute code
+		case "Paris":
+			  // execute code
+		case "Amsterdam":
+			  // execute code
+		case "Copenhagen":
+			  // execute code
+		    case "Berlin", "Munich":
+				//execute code for both
+
+			  // execute code
+		    default:
+			// execute if none there true for example: fmt.Println("No valid city selected")}*/
 	}
-	wg.Wait()
-
-	// *OLD PART*
-	/*city := "London"
-	switch city {
-	case "New York":
-		  // execute code
-	case "London":
-		  // execute code
-	case "Paris":
-		  // execute code
-	case "Amsterdam":
-		  // execute code
-	case "Copenhagen":
-		  // execute code
-	    case "Berlin", "Munich":
-			//execute code for both
-
-		  // execute code
-	    default:
-		// execute if none there true for example: fmt.Println("No valid city selected")}*/
 }
 
 // great function with info for user
 func greetUsers() {
+	fmt.Println("----------------------------------")
 	fmt.Printf("Welcome to %v booking application\n", conferenceName)
 	fmt.Printf("We have total of %v tickets and %v are still available.\n", conferenceTickets, remainingTickets)
 	fmt.Println("Get your tickets here to attend")
@@ -101,6 +105,7 @@ func getFirstNames() []string {
 
 // logic for user input information
 func getUserInput() (string, string, string, uint) {
+
 	var firstName string
 	var lastName string
 	var email string
@@ -119,6 +124,7 @@ func getUserInput() (string, string, string, uint) {
 	fmt.Scan(&userTickets)
 
 	return firstName, lastName, email, userTickets
+
 }
 
 // final part booking tickets function with user data, adding new in slice and show list of booking
@@ -161,4 +167,5 @@ func sendTicket(userTickets uint, firstName string, lastName string, email strin
 	fmt.Println("-----------------")
 	fmt.Println("SUCCESSFUL! Tickets have been sent")
 	wg.Done()
+
 }
